@@ -14,6 +14,19 @@ Name_List = [
     {"id":9, "name":"Zin"}
 ]
 
+@app.post("/names")
+def create_a_new_name (name:str):
+    new_id = Name_List[-1]["id"] + 1
+    name_obj = {"id":  new_id, "name": name}
+    Name_List.append(name_obj)
+    return name_obj
+
+@app.get("/names/{name_id}")
+def retrieve_name_detail (name_id:int):
+    for name in Name_List:
+        if name["id"] == name_id:
+            return name
+    return {"detail":"name_id is not in our server"}
 
 @app.get("/")
 def root():
