@@ -28,6 +28,22 @@ def retrieve_name_detail (name_id:int):
             return name
     return {"detail":"name_id is not in our server"}
 
+@app.put("/names/{name_id}")
+def retrieve_name_detail (name_id:int, name:str):
+    for item in Name_List:
+        if item["id"] ==name_id:
+            item["name"] = name
+            return item
+    return {"detail":"object not found"}
+
+@app.delete("/names/{name_id}")
+def retrieve_name_detail (name_id:int):
+    for item in Name_List:
+        if item["id"] ==name_id:
+            Name_List.remove(item)
+            return {"detail":"object removed successfully"}
+    return {"detail":"object not found"}
+
 @app.get("/")
 def root():
     return {"message":"Hello World:)"}
