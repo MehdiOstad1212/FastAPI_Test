@@ -1,4 +1,5 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Query
+from typing import Annotated
 
 app = FastAPI()
 
@@ -11,7 +12,9 @@ Name_List = [
     {"id":6, "name":"Fate"},
     {"id":7, "name":"Raihan"},
     {"id":8, "name":"Monica"},
-    {"id":9, "name":"Zin"}
+    {"id":9, "name":"Zin"},
+    {"id":10, "name":"Mehdi"},
+    {"id":11, "name":"Maria"}
 ]
 
 @app.post("/names")
@@ -49,5 +52,7 @@ def root():
     return {"message":"Hello World:)"}
 
 @app.get("/names")
-def Retvieve_Name_List():
+def Retvieve_Name_List(q:Annotated[str|None,Query(max_length=50)]=None):
+    if q:
+        return [item for item in Name_List if item["name"] == q]
     return Name_List
