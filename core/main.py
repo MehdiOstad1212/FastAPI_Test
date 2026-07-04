@@ -18,6 +18,22 @@ Name_List = [
     {"id":11, "name":"Maria"}
 ]
 
+@app.get("/")
+def root():
+    Content = {"message":"Hello World:)"}
+    return JSONResponse(content = Content, status_code= status.HTTP_202_ACCEPTED)
+
+@app.get("/names")
+def Retvieve_Name_List(q:Annotated[str|None,Query(max_length=50)]=None):
+    if q:
+        Content = [item for item in Name_List if item["name"] == q]
+        if Content == []:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail = "object not found")
+        return JSONResponse(content = Content, status_code= status.HTTP_200_OK)
+    Content = Name_List
+    return JSONResponse(content = Content, status_code= status.HTTP_200_OK)
+
+
 @app.post("/names", status_code=status.HTTP_201_CREATED)
 def create_a_new_name (name:str):
     new_id = Name_List[-1]["id"] + 1
@@ -51,18 +67,3 @@ def retrieve_name_detail (name_id:int):
             Content = {"detail":"object removed successfully"}
             return JSONResponse(content = Content, status_code = status.HTTP_200_OK)
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail = "object not found")
-
-@app.get("/")
-def root():
-    Content = {"message":"Hello World:)"}
-    return JSONResponse(content = Content, status_code= status.HTTP_202_ACCEPTED)
-
-@app.get("/names")
-def Retvieve_Name_List(q:Annotated[str|None,Query(max_length=50)]=None):
-    if q:
-        Content = [item for item in Name_List if item["name"] == q]
-        if Content == []:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail = "object not found")
-        return JSONResponse(content = Content, status_code= status.HTTP_200_OK)
-    Content = Name_List
-    return JSONResponse(content = Content, status_code= status.HTTP_200_OK)
