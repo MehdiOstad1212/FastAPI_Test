@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Query
+from fastapi import FastAPI, Query, status, HTTPException
 from typing import Annotated
 
 app = FastAPI()
@@ -17,7 +17,7 @@ Name_List = [
     {"id":11, "name":"Maria"}
 ]
 
-@app.post("/names")
+@app.post("/names", status_code=status.HTTP_201_CREATED)
 def create_a_new_name (name:str):
     new_id = Name_List[-1]["id"] + 1
     name_obj = {"id":  new_id, "name": name}
@@ -31,21 +31,21 @@ def retrieve_name_detail (name_id:int):
             return name
     return {"detail":"name_id is not in our server"}
 
-@app.put("/names/{name_id}")
+@app.put("/names/{name_id}",status_code=status.HTTP_200_OK)
 def retrieve_name_detail (name_id:int, name:str):
     for item in Name_List:
         if item["id"] ==name_id:
             item["name"] = name
             return item
-    return {"detail":"object not found"}
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail = "object not found")
 
-@app.delete("/names/{name_id}")
+@app.delete("/names/{name_id}", status_code=status.HTTP_200_OK)
 def retrieve_name_detail (name_id:int):
     for item in Name_List:
         if item["id"] ==name_id:
             Name_List.remove(item)
             return {"detail":"object removed successfully"}
-    return {"detail":"object not found"}
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail = "object not found")
 
 @app.get("/")
 def root():
