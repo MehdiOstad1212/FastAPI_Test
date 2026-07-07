@@ -24,7 +24,11 @@ def root():
     return JSONResponse(content = Content, status_code= status.HTTP_202_ACCEPTED)
 
 @app.get("/names")
-def Retvieve_Name_List(q:Annotated[str|None,Query(max_length=50)]=None):
+def Retvieve_Name_List(q:Annotated[str|None,
+                                   Query(title="search", alias="search", 
+                                         description="Searching the provided title", 
+                                         example="Mehdi" , deprecated= True, 
+                                         max_length=50)]=None):
     if q:
         Content = [item for item in Name_List if item["name"] == q]
         if Content == []:
