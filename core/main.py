@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Query, status, HTTPException, Path, Form
+from fastapi import FastAPI, Query, status, HTTPException, Path, Form, Body
 from fastapi.responses import JSONResponse
 from typing import Annotated
 
@@ -39,7 +39,11 @@ def Retvieve_Name_List(q:Annotated[str|None,
 
 
 @app.post("/names", status_code=status.HTTP_201_CREATED)
-def create_a_new_name (name:str = Form()):
+def create_a_new_name (name:str = Body (...,
+                                        title="Adding a name",
+                                        description="Write the name that you want to" \
+                                        "add to the list", example="Mehdi",
+                                        embed=True)):
     new_id = Name_List[-1]["id"] + 1
     name_obj = {"id":  new_id, "name": name}
     Name_List.append(name_obj)
