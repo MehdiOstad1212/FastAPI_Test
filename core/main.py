@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Query, status, HTTPException
+from fastapi import FastAPI, Query, status, HTTPException, Path
 from fastapi.responses import JSONResponse
 from typing import Annotated
 
@@ -47,7 +47,9 @@ def create_a_new_name (name:str):
     return JSONResponse(content = Content, status_code= status.HTTP_201_CREATED)
 
 @app.get("/names/{name_id}")
-def retrieve_name_detail (name_id:int):
+def retrieve_name_detail (name_id:int = Path(title= "Object id",
+                                             description="The id related to " \
+                                             "a name in the Name List")):
     for name in Name_List:
         if name["id"] == name_id:
             Content = name
