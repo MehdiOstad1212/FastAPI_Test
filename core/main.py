@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Query, status, HTTPException, Path
+from fastapi import FastAPI, Query, status, HTTPException, Path, Form
 from fastapi.responses import JSONResponse
 from typing import Annotated
 
@@ -39,7 +39,7 @@ def Retvieve_Name_List(q:Annotated[str|None,
 
 
 @app.post("/names", status_code=status.HTTP_201_CREATED)
-def create_a_new_name (name:str):
+def create_a_new_name (name:str = Form()):
     new_id = Name_List[-1]["id"] + 1
     name_obj = {"id":  new_id, "name": name}
     Name_List.append(name_obj)
@@ -57,7 +57,7 @@ def retrieve_name_detail (name_id:int = Path(title= "Object id",
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail = "name_id is not in our server")
 
 @app.put("/names/{name_id}",status_code=status.HTTP_200_OK)
-def retrieve_name_detail (name_id:int, name:str):
+def retrieve_name_detail (name_id:int = Path(), name:str = Form()):
     for item in Name_List:
         if item["id"] ==name_id:
             item["name"] = name
