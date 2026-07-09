@@ -1,6 +1,6 @@
-from fastapi import FastAPI, Query, status, HTTPException, Path, Form, Body
+from fastapi import FastAPI, Query, status, HTTPException, Path, Form, Body, File, UploadFile
 from fastapi.responses import JSONResponse
-from typing import Annotated
+from typing import Annotated, List
 
 app = FastAPI()
 
@@ -77,3 +77,26 @@ def retrieve_name_detail (name_id:int):
             Content = {"detail":"object removed successfully"}
             return JSONResponse(content = Content, status_code = status.HTTP_200_OK)
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail = "object not found")
+
+@app.post("/upload_file/")
+async def upload_file(file: UploadFile = File(...)):
+    content = await file.read()
+    return {"file_name": file.filename, "content_type": file.content_type, "file_size": len(content)}
+
+'''
+@app.post("/upload-multiple/")
+async def upload_multiple(files: List[UploadFile] = File(...)):
+    return [
+        {"filename": file.filename, "content_type": file.content_type}
+        for file in files
+    ]
+
+@app.post("/upload-multiple/")
+async def upload_multiple(
+    files: Annotated[List[UploadFile], File(description="Multiple files to upload")]
+):
+    return [
+        {"filename": file.filename, "content_type": file.content_type} 
+        for file in files
+    ]
+'''
