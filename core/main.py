@@ -1,8 +1,15 @@
 from fastapi import FastAPI, Query, status, HTTPException, Path, Form, Body, File, UploadFile
 from fastapi.responses import JSONResponse
 from typing import Annotated, List
+from contextlib import asynccontextmanager
 
-app = FastAPI()
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    print("Application Start Up")
+    yield
+    print("Application Shut Down")
+
+app = FastAPI(lifespan = lifespan)
 
 Name_List = [
     {"id":1, "name":"Mehdi"},
