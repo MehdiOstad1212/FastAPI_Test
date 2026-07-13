@@ -3,6 +3,7 @@ from fastapi.responses import JSONResponse
 from typing import Annotated, List
 from contextlib import asynccontextmanager
 from dataclasses import dataclass
+from Schemas import PersonCreateSchema, PersonResponseSchema, PersonUpdateSchema
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -31,7 +32,7 @@ def root():
     Content = {"message":"Hello World:)"}
     return JSONResponse(content = Content, status_code= status.HTTP_202_ACCEPTED)
 
-@app.get("/names")
+@app.get("/names", response_model = PersonResponseSchema)
 def Retvieve_Name_List(q:Annotated[str|None,
                                    Query(title="search", alias="search", 
                                          description="Searching the provided title", 
@@ -45,28 +46,16 @@ def Retvieve_Name_List(q:Annotated[str|None,
     Content = Name_List
     return JSONResponse(content = Content, status_code= status.HTTP_200_OK)
 
-@dataclass
-class Student:
-    name: str
-    age: int
-'''    price: float
-    description: Union [str, None] = None (from typing import Union)
-    tax: Union [float,None] = None '''
 
-@dataclass
-class StudentResponse:
-    id: int
-    name: str
-
-@app.post("/names", status_code=status.HTTP_201_CREATED, response_model=StudentResponse)
-def create_a_new_name (name: Student):
+@app.post("/names", status_code=status.HTTP_201_CREATED, response_model=PersonResponseSchema)
+def create_a_new_name (person: PersonCreateSchema):
     new_id = Name_List[-1]["id"] + 1
-    name_obj = {"id":  new_id, "name": name.name}
+    name_obj = {"id":  new_id, "name": person.name}
     Name_List.append(name_obj)
     Content = name_obj
     return JSONResponse(content = Content, status_code= status.HTTP_201_CREATED)
 
-@app.get("/names/{name_id}")
+@app.get("/names/{name_id}", response_model = PersonResponseSchema)
 def retrieve_name_detail (name_id:int = Path(title= "Object id",
                                              description="The id related to " \
                                              "a name in the Name List")):
@@ -76,11 +65,11 @@ def retrieve_name_detail (name_id:int = Path(title= "Object id",
             return JSONResponse(content = Content, status_code= status.HTTP_200_OK)
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail = "name_id is not in our server")
 
-@app.put("/names/{name_id}",status_code=status.HTTP_200_OK)
-def retrieve_name_detail (name_id:int = Path(), name:str = Form()):
+@app.put("/names/{name_id}",status_code=status.HTTP_200_OK, response_model= PersonResponseSchema)
+def retrieve_name_detail (person: PersonUpdateSchema, name_id:int = Path()):
     for item in Name_List:
-        if item["id"] ==name_id:
-            item["name"] = name
+        if item["id"] == name_id:
+            item["name"] = person.name
             Content = item
             return JSONResponse(content = Content, status_code= status.HTTP_200_OK)
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail = "object not found")
