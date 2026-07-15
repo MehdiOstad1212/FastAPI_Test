@@ -5,6 +5,10 @@ class User(BaseModel):
     email: EmailStr
     account_id: int
 
+    @field_serializer("name")
+    def serialize_name(self, value):
+        return value.title()
+
 class Model(BaseModel):
     number: float
     @field_serializer("number")
@@ -12,7 +16,7 @@ class Model(BaseModel):
         return round(value, 5)
 
 
-user = User(name = "Mehdi", email = "Ostad@gmail.com", account_id= "123")
+user = User(name = "mehdi", email = "Ostad@gmail.com", account_id= "123")
 
 A = user.model_dump()
 print (A)

@@ -1,8 +1,8 @@
-from pydantic import BaseModel,field_validator
+from pydantic import BaseModel, field_validator, Field, field_serializer
 import re
 
 class BasePersonSchema (BaseModel):
-    name: str
+    name: str = Field(..., description = "Enter the student's name")
 
     @field_validator("name")
     def validate_name(cls, value):
@@ -12,12 +12,16 @@ class BasePersonSchema (BaseModel):
         if not bool(re.match(pattern, value)):
             raise ValueError("Name must only contain alphabetic characters and space")
         return value
+    
+    @field_serializer("name")
+    def capitalize_name(self, value: str):
+        return value.title()
 
 class PersonCreateSchema (BasePersonSchema):
     pass
 
 class PersonResponseSchema (BasePersonSchema):
-    id: int
+    id: int = Field(..., description = "Unique user identifier")
 
 class PersonUpdateSchema (BasePersonSchema):
     pass
