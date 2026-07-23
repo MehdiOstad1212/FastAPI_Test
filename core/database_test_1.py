@@ -22,7 +22,7 @@ class User (Base):
     hashed_password = Column(String, nullable = True)
     is_active = Column(Boolean, default = True)
 
-    addressess = relationship("Address")
+    addressess = relationship("Address", uselist = False)
 
 
     '''@property
@@ -83,7 +83,8 @@ print (user)'''
 
 user = session.query(User).filter(or_(User.first_name == "Mehdi", User.age > 20)).first()
 print (user)
-A = user.addressess
+A = user.addressess.city
+print (A)
 
 '''addresses = [Address(user_id = user.id, city = "Tehran", state = "Tehran",
                       zip_code = "12346"), Address(user_id = user.id, city = "Abad", 
