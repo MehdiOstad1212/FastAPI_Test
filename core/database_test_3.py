@@ -1,5 +1,5 @@
 from sqlalchemy import create_engine, Column, Integer, String, Boolean, Text
-from sqlalchemy import or_, not_, func, text, ForeignKey, DateTime
+from sqlalchemy import or_, not_, func, text, ForeignKey, DateTime, Table, UniqueConstraint
 from sqlalchemy.orm import sessionmaker, declarative_base, relationship
 import datetime
 
@@ -13,6 +13,14 @@ session = SessionLocal()
 
 Base = declarative_base()
 
+enrollments = Table("enrollments", Base.metadata,
+                    Column("id", Integer, primary_key = True, autoincrement = True),
+                    Column("user_id", Integer, ForeignKey("users.id")),
+                    Column("course_id", Integer, ForeignKey("courses.id")),
+                    Column("enrolled_date", DateTime(), default = datetime.datetime.now()),
+                    UniqueConstraint("user_id", "course_id", name ="Unique_user_course_enrolled")
+                    )
+
 class User (Base):
     __tablename__ = "users"
     id = Column(Integer, primary_key = True, autoincrement = True)
@@ -22,6 +30,7 @@ class User (Base):
     is_active = Column(Boolean, default = True)
 
     post = relationship("Post", backref = "user")
+    courses = relationship("Course", secondary = enrollments, back_populates = "attendees")
 
     def __repr__(self):
         return f"User (id = {self.id!r}, email = {self.email
@@ -56,6 +65,18 @@ class Comment(Base):
 
     def __repr__(self):
         return f"Comment (id = {self.id}, user_id = {self.user_id}, post_id = {self.post_id}), parent_id = {self.parent_id}"
+
+class Course(Base):
+    __tablename__ = "courses"
+    id = Column(Integer, primary_key = True, autoincrement = True)
+    title = Column(String())
+    description = Column(Text())
+    created_date = Column(DateTime(), default = datetime.datetime.now())
+
+    attendees = relationship("User", secondary = enrollments, back_populates = "courses")
+
+    def __repr__(self):
+        return f"Course(id = {self.id}, title = {self.title})"
 
 
 
@@ -101,11 +122,24 @@ print (comments)
 for comment in comments:
     print (comment.children)
 
-user = session.query(User).filter(or_(User.email == "Maryam@love.com",
+'''user = session.query(User).filter(or_(User.email == "Maryam@love.com",
                                        User.hashed_password == "20")).first()
 post = user.post[0]
 print (post)
 post.title = "example_2_new"
-session.commit()
+session.commit()'''
+
+user = session.query(User).filter(or_(User.email == "Maryam@love.com",
+                                       User.hashed_password == "20")).first()
+'''course_1 = Course(title = "Math", description = "This is a great math course")
+session.add(course_1)
+
+course_1.attendees.append(user)
+session.commit()'''
+
+course = session.query(Course).filter_by(title = "Math").one()
+
+print(course.attendees)
+print(user.courses)
 
 session.close()
