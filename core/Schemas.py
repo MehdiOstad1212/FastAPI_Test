@@ -12,10 +12,6 @@ class BasePersonSchema (BaseModel):
         if not bool(re.match(pattern, value)):
             raise ValueError("Name must only contain alphabetic characters and space")
         return value
-    
-    @field_serializer("name")
-    def capitalize_name(self, value: str):
-        return value.title()
 
 class PersonCreateSchema (BasePersonSchema):
     pass

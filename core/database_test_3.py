@@ -131,6 +131,7 @@ session.commit()'''
 
 user = session.query(User).filter(or_(User.email == "Maryam@love.com",
                                        User.hashed_password == "20")).first()
+
 '''course_1 = Course(title = "Math", description = "This is a great math course")
 session.add(course_1)
 
